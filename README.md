@@ -1,9 +1,14 @@
-# 👾 Bit Manipulation Functions and IPC in C
+# 🔢 Embedded C Concepts
 
-This repository contains a diverse collection of C functions designed for bit manipulation, analysis, and a special feature on inter-process communication (IPC) using UNIX pipes in the xv6 environment.
+This repository contains a diverse collection of C functions, focusing on bit manipulation, memory manipulation, and a special feature on inter-process communication (IPC) using UNIX pipes in the xv6 environment.
 
-- [🏓 PingPong Program](#-pingpong-program)
+![Alt text](bits_cover.png)
+
+- [💾 Failed Interview Self-Study: Custom malloc \& free Implementation](#-failed-interview-self-study-custom-malloc--free-implementation)
   - [Overview](#overview)
+  - [Key Takeaways](#key-takeaways)
+- [🏓 PingPong Program](#-pingpong-program)
+  - [Overview](#overview-1)
   - [Features](#features)
   - [How It Works](#how-it-works)
   - [Getting Started](#getting-started)
@@ -11,20 +16,45 @@ This repository contains a diverse collection of C functions designed for bit ma
   - [Compilation and Execution](#compilation-and-execution)
   - [Output](#output)
 - [🔒 Multi-threaded Counter with POSIX Threads](#-multi-threaded-counter-with-posix-threads)
-  - [Overview](#overview-1)
+  - [Overview](#overview-2)
   - [Features](#features-1)
   - [How It Works](#how-it-works-1)
   - [Getting Started](#getting-started-1)
   - [Output](#output-1)
   - [Note](#note)
-- [Bitwise Example Program 👾](#bitwise-example-program-)
-- [Count Bits Program 🧮](#count-bits-program-)
+- [👾 Bitwise Example Program](#-bitwise-example-program)
+- [🧮 Count Bits Program](#-count-bits-program)
   - [How to Use](#how-to-use)
   - [Examples](#examples)
 - [License](#license)
 
+---
 
-![Alt text](cover.png)
+## 💾 Failed Interview Self-Study: Custom malloc & free Implementation
+
+### Overview
+
+The [mymalloc.c](mymalloc.c) program is a result of my self-study following a failed interview question. It includes a custom implementation of the `malloc` and `free` functions in C, encapsulated within `mymalloc` and `myfree` wrapper functions. These functions are uniquely designed to allocate and free memory addresses aligned to specific hexadecimal increments (0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x00).
+
+The offset from the original to the aligned address is stored in the byte immediately preceding the address returned by `mymalloc`.
+
+This project was an insightful journey into pointers and memory allocation in C, spurred by my experience in an interview setting.
+
+---
+
+### Key Takeaways
+
+1. **Pointer Arithmetic and Type Size Awareness:**
+    - Adding 1 to a pointer increases the address by the size of the type it points to. For instance, adding 1 to a `char *` (1 byte) increments the address by 1 byte. Conversely, adding 1 to an `unsigned long long *` (8 bytes) increments it by 8 bytes. My initial attempts inadvertently added 32 * sizeof(unsigned long long) (256 bytes), instead of the intended 32 bytes for the custom alignment (0x20).
+
+2. **Subtracting from Pointers:**
+    - Similarly, subtracting 1 from a pointer decrements the address by the size of the type it points to. My initial approach subtracted 1 from larger types, like `unsigned long long *`, which decremented the address by 8 bytes, instead of the intended 1 byte. The correct approach is to use a `char *`, which decrements the address by 1 byte.
+
+3. **Using the Modulus Operator with Pointers:**
+    - The modulus operator `%` is applicable only to integer types. To use it with pointers, explicit casting to an appropriate integer type is necessary, as pointers are not inherently integer types.
+
+4. **Casting when Working with Pointers:**
+    - When returning a pointer from `mymalloc`, it should be cast to `(void *)` to match the return type of the standard `malloc` function. This ensures compatibility and proper use in various contexts. Similarly, casting is required when calling `malloc`, as it returns a `(void *)` pointer, which must be cast to the appropriate type.
 
 ---
 
@@ -33,6 +63,8 @@ This repository contains a diverse collection of C functions designed for bit ma
 ### Overview
 
 👨‍🏫 File [pingpong.c](pingpong.c) contains the PingPong program, a highlight of this repository, is an educational tool designed to demonstrate IPC using UNIX pipes in the xv6 environment. It allows two processes – a parent and a child – to communicate by "ping-ponging" a byte back and forth, providing a hands-on experience in process communication.
+
+![Alt text](cover.png)
 
 ### Features
 
@@ -119,7 +151,7 @@ This program is designed as an educational tool to understand the basics of mult
 
 ---
 
-## Bitwise Example Program 👾
+## 👾 Bitwise Example Program
 
 ![Alt text](image.png)
 
@@ -134,7 +166,7 @@ File [bitwise.c](bitwise.c) includes simple bitwise operations in C:
 
 ---
 
-## Count Bits Program 🧮
+## 🧮 Count Bits Program
 
 ![Alt text](bits_cover.png)
 
