@@ -1,44 +1,63 @@
 /* This program is a custom implementation of the malloc and free functions in
  * C. it returness aligned adress with offsent to 32.
  */
-
+#include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void *mymalloc(unsigned int size) {
-  // Allocate extra memory for alignment and storing the offset
-  char *p = (char *)malloc(size + 2); // Allocate extra space for alignment
-
-  if (p == NULL) {
-    return NULL;
+void *mymalloc(size_t size) {
+  uintptr_t original_ptr = (uintptr_t)malloc(size + 4*sizeof(int));
+  if (!original_ptr) {
+    return NULL; // Allocation failed
   }
 
-  // Calculate the offset
-  unsigned int offset = (32 - ((unsigned long)p % 32)) % 32;
+  char offset = (((original_ptr&0x1f) + 0x1f) & ~0x1f) - (original_ptr&0x1f);
+  if (offset == 0) {
+    offset = 32;
+  }
 
-  char *ret = p + offset;
+  char *aligned_ptr = (char *)(original_ptr + offset);
+  printf("offset set to %d\n", offset);
 
-  // Store the offset just before the aligned address
-  ret[-1] = offset;
+  ((char *)aligned_ptr)[-1] = offset;
 
-  return (void *)(ret);
+  return (void *)aligned_ptr;
 }
 
 void myfree(void *ptr) {
-  // Retrieve the offset and calculate the original pointer
-  unsigned char *aligned = (unsigned char *)ptr;
-  unsigned char offset = *(aligned - 1);
-  free(*(aligned - offset));
+  if (ptr != NULL) {
+    char *aligned_ptr = (char *)ptr;
+    char offset = aligned_ptr[-1];
+    free((void *)aligned_ptr - offset);
+  }
 }
 
 int main(void) {
-  int **ptr = (int **)mymalloc(sizeof(int *) * 5);
-  for (int i = 0; i < 5; i++) {
-    ptr[i] = (char *)mymalloc(sizeof(char));
-    printf("ptr[%d]: %p\n", i, ptr[i]);
-    myfree(ptr[i]);
+  printf("Normal address allocation:\n");
+  char *arr[10];
+  for (int i = 0; i < 10; i++) {
+    int size = rand() % 100 + 1;
+    printf("Allocating %d bytes\n", size);
+    arr[i] = (char *)malloc(size * sizeof(char));
+    printf("arr[%d] address in hexadecimal: %p\n", i, (void *)arr[i]);
+    printf("arr[%d] address in decimal mod 32: %ld\n\n", i, (uintptr_t)arr[i] % 32);
   }
-  printf("ptr: %p\n", ptr);
+
+  printf("\n===================\nAligned address allocation:\n");
+  char *m_arr[10];
+  for (int i = 0; i < 10; i++) {
+    int size = rand() % 100 + 1;
+    printf("Allocating %d bytes\n", size);
+    m_arr[i] = (char *)mymalloc(size * sizeof(char));
+    printf("arr[%d] address in hexadecimal: %p\n", i, (void *)m_arr[i]);
+    printf("arr[%d] address in decimal mod 32: %ld\n\n", i, (uintptr_t)m_arr[i] % 32);
+  }
+
+  for (int i = 0; i < 10; i++) {
+    myfree(m_arr[i]);
+    free(arr[i]);
+  }
 
   return 0;
 }
