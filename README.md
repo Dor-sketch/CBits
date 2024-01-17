@@ -38,13 +38,13 @@ This repository contains a diverse collection of C functions, focusing on bit ma
 
 ### Overview
 
-![Alt text](image-1.png)azQS 
-
 The [mymalloc.c](mymalloc.c) program is a result of my self-study following a failed interview question. It includes a custom implementation of the `malloc` and `free` functions in C, encapsulated within `mymalloc` and `myfree` wrapper functions. These functions are uniquely designed to allocate and free memory addresses aligned to specific hexadecimal increments (0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x00).
 
 The offset from the original to the aligned address is stored in the byte immediately preceding the address returned by `mymalloc`.
 
 This project was an insightful journey into pointers and memory allocation in C, spurred by my experience in an interview setting.
+
+![Alt text](image-1.png)
 
 ---
 
@@ -233,9 +233,11 @@ File [count_bits.c](count_bits.c) offers functions for counting bits:
 ### Examples
 
 [count_bits example](examples_count_bits.png)
+
 ![Alt text](./images/examples_count_bits.png)
 
 [count_odd_bits example](examples_odd_bits.png)
+
 ![Alt text](./images/examples_odd_bits.png)
 
 ---
