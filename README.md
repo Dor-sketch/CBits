@@ -8,33 +8,48 @@ This repository contains a diverse collection of C functions, focusing on bit ma
 
 ---
 
-- [💾 Failed Interview Self-Study: Custom malloc \& free Implementation](#-failed-interview-self-study-custom-malloc--free-implementation)
+<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=3 orderedList=false} -->
+
+<!-- code_chunk_output -->
+
+- [💾 Custom malloc & free Implementation](#-custom-malloc--free-implementation)
   - [Overview](#overview)
   - [Key Takeaways](#key-takeaways)
-- [🏓 PingPong Program](#-pingpong-program)
+- [🧬 Basice Implementation of Inheritance and Polymorphism in C](#-basice-implementation-of-inheritance-and-polymorphism-in-c)
   - [Overview](#overview-1)
   - [Features](#features)
+  - [Structure Overview](#structure-overview)
+  - [Usage](#usage)
+- [🏓 Pipes PingPong Program](#-pipes-pingpong-program)
+  - [Overview](#overview-2)
+  - [Features](#features-1)
   - [How It Works](#how-it-works)
   - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Compilation and Execution](#compilation-and-execution)
   - [Output](#output)
 - [🔒 Multi-threaded Counter with POSIX Threads](#-multi-threaded-counter-with-posix-threads)
-  - [Overview](#overview-2)
-  - [Features](#features-1)
+  - [Overview](#overview-3)
+  - [Features](#features-2)
   - [How It Works](#how-it-works-1)
   - [Getting Started](#getting-started-1)
   - [Output](#output-1)
   - [Note](#note)
-- [👾 Bitwise Example Program](#-bitwise-example-program)
 - [🧮 Count Bits Program](#-count-bits-program)
+  - [Lookup Table](#lookup-table)
+  - [Using n&(n-1) algorithm of Brian Kernighan](#using-nn-1-algorithm-of-brian-kernighanhttpsenwikipediaorgwikibrian_kernighan)
+  - [Iterative Approach](#iterative-approach)
+  - [Utils Functions](#utils-functions)
   - [How to Use](#how-to-use)
   - [Examples](#examples)
-- [License](#license)
+- [👾 Bitwise Examples Program](#-bitwise-examples-program)
+- [📚 License](#-license)
+
+<!-- /code_chunk_output -->
 
 ---
 
-## 💾 Failed Interview Self-Study: Custom malloc & free Implementation
+## 💾 Custom malloc & free Implementation
 
 ### Overview
 
@@ -44,7 +59,10 @@ The offset from the original to the aligned address is stored in the byte immedi
 
 This project was an insightful journey into pointers and memory allocation in C, spurred by my experience in an interview setting.
 
-![Alt text](image-1.png)
+<p align="center">
+  <img src="./images/my_malloc_output.png" width="400">
+</p>
+
 
 ---
 
@@ -70,12 +88,73 @@ This project was an insightful journey into pointers and memory allocation in C,
 
     - The `malloc` function returns a pointer to a memory address thats already aligned. The implementation is actually using a header `union` and inside it a `struct`.
 
+To see example based on 20 random sizes allocation, run the following command:
 
-![Alt text](image.png)
+```bash
+gcc -o mymalloc mymalloc.c && ./mymalloc
+```
+
+![Alt text](images/mymalloc_valgrind.png)
 
 ---
 
-## 🏓 PingPong Program
+## 🧬 Basice Implementation of Inheritance and Polymorphism in C
+
+![Alt text](images/oop_output.png)
+
+### Overview
+
+File [oop.c](oop.c) includes a simple implementation of OOP concepts in C. The design is inspired by the `C++` implementation of OOP, which uses structs and function pointers to achieve polymorphism.
+
+### Features
+
+#### 🧬 Inheritance
+
+- Structs such as `Dog`, `Cat`, and `Labrador` are defined as extensions of the `Animal` struct, representing classical inheritance. This is achieved by embedding an `Animal` struct within each of them, allowing them to be treated polymorphically.
+
+#### 🎭 Polymorphism
+
+- Polymorphism is implemented via a virtual table (vtable) mechanism. Each struct has a pointer (`vptr`) to its corresponding vtable, which contains function pointers for different behaviors.
+
+- The vtable allows objects of different types to exhibit unique behaviors, despite sharing the same base interface.
+
+#### 📦 Encapsulation
+
+- Behaviors of the structs are encapsulated within function pointers in the vtable. This approach hides the implementation details from the user, providing a clean interface.
+
+#### 📞 Uniform Function Calls
+
+- Wrapper functions like `animal_speak` provide a uniform way to invoke methods on any animal, abstracting away the complexity of direct vtable access.
+
+#### 💾 Memory Management
+
+- Dynamic memory allocation is used for creating instances, mimicking the object construction in OOP languages.
+
+#### 🔀 Type Casting
+
+- Appropriate casting is performed when derived types are treated as base types, a necessary step due to C's lack of inherent polymorphism.
+
+### Structure Overview
+
+- 🏗️ `struct Animal`: The base struct representing a generic animal.
+
+- 🏗️ `struct Dog/Cat/Labrador`: Derived structs representing specific animals.
+
+- 🏗️ `struct VTable`: A struct representing the vtable with function pointers for polymorphic behavior.
+
+- 🏗️ `*_new` functions: Functions for creating new instances of structs.
+
+### Usage
+
+The main function in `main.c` demonstrates the creation of different animal types and the invocation of their behaviors.
+
+```bash
+gcc -o oop oop.c main.c && ./oop
+```
+
+---
+
+## 🏓 Pipes PingPong Program
 
 ### Overview
 
@@ -85,11 +164,12 @@ This project was an insightful journey into pointers and memory allocation in C,
   <img src="./images/cover.png" width="400">
 </p>
 
-
 ### Features
 
 - **IPC Demonstration**: Showcases pipes for process-to-process communication.
+
 - **Performance Metrics**: Outputs the performance of IPC in terms of exchanges per second.
+
 - **Educational Tool**: Perfect for teaching operating systems and process communication.
 
 ### How It Works
@@ -178,41 +258,78 @@ This program is designed as an educational tool to understand the basics of mult
 
 ---
 
-## 👾 Bitwise Example Program
-
-![Alt text](./images/image.png)
-
-File [bitwise.c](bitwise.c) includes simple bitwise operations in C:
-
-- **Bits Union**: Represents a float in binary according to IEEE 754.
-
-- **XORing**: Swaps numbers using XOR.
-
-- **Bit Shifting**: Shifts a number left and right by 1 bit.
-
-- **Bit Masking**: Applies a mask to a number.
-
-- **Bit Toggling**: Toggles a specific bit in a number.
-
-- **Bit Setting**: Sets a specific bit in a number.
-
----
-
 ## 🧮 Count Bits Program
 
 <p align="center">
-  <img src="./images/bits_cover.png" width="400">
+  <img src="images/count_bits_1.png" width="400">
 </p>
 
-File [count_bits.c](count_bits.c) offers functions for counting bits:
+File [count_bits.c](count_bits.c) offers basice functions to count bits in C:
+
+### Lookup Table
+
+The lookup table stores the number of 1 bits in a nibble (4 bits). This allows the program to count the number of 1 bits in a number by summing the number of 1 bits in each nibble.
+
+The index of the lookup table is the nibble itself, and the value is the number of 1 bits in that nibble. For instance, the number of 1 bits in the nibble `0b1010` (10 in 10 base) is 2, which is stored in the lookup table at index `0b1010`.
+
+This approach is more efficient than counting the bits in each nibble individually, as it avoids the need for a loop. For even more efficiency, the lookup table can be extended to include the number of 1 bits in a byte (8 bits), or even a word (16 bits) ETC.
+
+Full table of $n$ bits will require $2^{n}$ entries, which is $2^4$ entries for a nibble, or 16 entries. Even thogh, becuse the smallest data type in C is a byte (8 bits), the table will require 16 entries * 8 bits = 128 bits, which is 16 bytes.
+
+A table for a word will require $2^{16}$ entries, which is 64KB without considering the data type. The size can be reduced by using a smaller data type for the table entries, such as `uint8_t` or `uint16_t`.
+
+  | 4-bit lookup table from 0 (right down) to 15 (left up) |
+  | :----------------------------------------------------: |
+  | ![Alt Text](images/table.png)          |
+
+### Using n&(n-1) algorithm of [Brian Kernighan](https://en.wikipedia.org/wiki/Brian_Kernighan)
+
+The second version of the program uses the algorithm of Brian Kernighan, which is based on the fact that $n\&(n-1)$ always clears the least significant bit of $n$.
+
+For Example:
+
+| n | 0 | 0 | 0 | 0 | 1 | 0 | 1 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| :- | - | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| n - 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| n & (n - 1) | 0 | 0 | 0 | 0 | **1** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+The algorithm works by counting the number of times $n\&(n-1)$ is performed until $n$ becomes 0. The number of times the operation is performed is the number of 1 bits in $n$.
+
+### Iterative Approach
+
+The naive approach to counting the number of 1 bits in a number is to iterate over each bit and check if it's 1. This approach is inefficient, as it requires a loop and a conditional check for each bit.
+
+---
+
+### Utils Functions
+
+The program also includes several utility functions for printing bits and counting bits in different data types.
+
+One of the most useful functions is `printBits`, which prints the binary representation **of any data type**. This function is useful for debugging and understanding the binary representation of different data types.
+
+```C
+/* printBits: print the bits in any data type */
+void printBits(void *ptr, size_t size) {
+   unsigned char *bytes = (unsigned char *)ptr;
+   for (size_t i = size - 1; i != SIZE_MAX; i--) {
+      for (int j = 7; j >= 0; j--) {
+       printf("%d", (bytes[i] >> j) & 1);
+      }
+      putchar(' '); // print a space after each byte
+   }
+   putchar('\n');
+}
+```
+
+The function takes a pointer to any data type and its size in bytes. It then cast the pointer to an `unsigned char *` to allow byte-level access. It then iterates over each byte, printing its bits from the most significant bit to the least significant bit.
+
+The program also includes the following functions:
 
 - **printRecursiveBits**: Recursively prints binary representation of an integer.
 
 - **printIntBits**: Prints the bits of an int iteratively.
 
 - **printBits**: Prints binary representation of any data type.
-
-- **count_bits**: Counts the number of 1's in a number.
 
 - **getSizeInBits**: Returns the size of a data type in bits.
 
@@ -242,6 +359,26 @@ File [count_bits.c](count_bits.c) offers functions for counting bits:
 
 ---
 
-## License
+## 👾 Bitwise Examples Program
+
+![Alt text](./images/image.png)
+
+File [bitwise.c](bitwise.c) includes simple bitwise operations in C:
+
+- **Bits Union**: Represents a float in binary according to IEEE 754.
+
+- **XORing**: Swaps numbers using XOR.
+
+- **Bit Shifting**: Shifts a number left and right by 1 bit.
+
+- **Bit Masking**: Applies a mask to a number.
+
+- **Bit Toggling**: Toggles a specific bit in a number.
+
+- **Bit Setting**: Sets a specific bit in a number.
+
+---
+
+## 📚 License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
