@@ -284,7 +284,7 @@ A table for a word will require $2^{16}$ entries, which is 64KB without consider
 
 ### Using n&(n-1) algorithm of [Brian Kernighan](https://en.wikipedia.org/wiki/Brian_Kernighan)
 
-The second version of the program uses the algorithm of Brian Kernighan, which is based on the fact that $n\&(n-1)$ always clears the least significant bit of $n$.
+The second version of the program uses the algorithm of Brian Kernighan, which is based on the fact that `n&(n-1)` always clears the least significant bit of $n$.
 
 For Example:
 
@@ -293,7 +293,7 @@ For Example:
 | n - 1 | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
 | n & (n - 1) | 0 | 0 | 0 | 0 | **1** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-The algorithm works by counting the number of times $n\&(n-1)$ is performed until $n$ becomes 0. The number of times the operation is performed is the number of 1 bits in $n$.
+The algorithm works by counting the number of times `n&(n-1)` is performed until $n$ becomes 0. The number of times the operation is performed is the number of 1 bits in $n$.
 
 ### Iterative Approach
 
