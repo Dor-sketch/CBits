@@ -1,6 +1,7 @@
 /*
-!./images
+!images
 !*.c
 !makefile
 !*.md
 !.gitignore
+!*.txt
