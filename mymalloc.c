@@ -6,58 +6,71 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+struct ThirtyTwoBytes {
+	char data[32];
+};
+
 void *mymalloc(size_t size) {
-  uintptr_t original_ptr = (uintptr_t)malloc(size + 4*sizeof(int));
-  if (!original_ptr) {
-    return NULL; // Allocation failed
-  }
+	// get the original pointer + 32 bytes.
+	unsigned char *original_ptr = (unsigned char *)malloc(
+		size + 32); // Using unsigned char to move the pointer by bytes
 
-  char offset = (((original_ptr&0x1f) + 0x1f) & ~0x1f) - (original_ptr&0x1f);
-  if (offset == 0) {
-    offset = 32;
-  }
+	if (!original_ptr) {
+		return NULL; // Allocation failed
+	}
 
-  char *aligned_ptr = (char *)(original_ptr + offset);
-  printf("offset set to %d\n", offset);
+	unsigned char i = 0;
+	for (i = 0; i < 31; i++) {
+		if (!((uintptr_t)(&original_ptr[i]) % 32)) {
+			break;
+		}
+	}
 
-  ((char *)aligned_ptr)[-1] = offset;
+	if (i == 0) {
+		i = 32;
+	}
 
-  return (void *)aligned_ptr;
+	char *aligned_ptr = original_ptr + i;
+
+	// printf("offset set to %d\n bytes", i);
+
+	*(aligned_ptr - 1) =
+		i; // Store the offset in the byte before the aligned pointer
+
+	return (void *)aligned_ptr;
 }
 
 void myfree(void *ptr) {
-  if (ptr != NULL) {
-    char *aligned_ptr = (char *)ptr;
-    char offset = aligned_ptr[-1];
-    free((void *)aligned_ptr - offset);
-  }
+	if (ptr != NULL) {
+		unsigned char *aligned_ptr = (unsigned char *)ptr;
+		unsigned char offset = aligned_ptr[-1];
+		free((void *)aligned_ptr - offset);
+	}
+}
+
+void test_mymalloc(void *(*alloc_func)(size_t), void (*free_func)(void *)) {
+
+	char *arr[10];
+
+	for (int i = 0; i < 10; i++) {
+		int size = rand() % 100 + 1;
+		arr[i] = (char *)alloc_func(size * sizeof(char));
+		printf("| (void *)&arr[%d] = %p | alocating %d bytes | arr[%d] = %p | "
+			   "(uintptr_t)arr[%d] %% 32 = %2lu |\n",
+			   i, (void *)&arr[i], size, i, arr[i], i, (uintptr_t)arr[i] % 32);
+	}
+
+	for (int i = 0; i < 10; i++) {
+		free_func(arr[i]);
+	}
 }
 
 int main(void) {
-  printf("Normal address allocation:\n");
-  char *arr[10];
-  for (int i = 0; i < 10; i++) {
-    int size = rand() % 100 + 1;
-    printf("Allocating %d bytes\n", size);
-    arr[i] = (char *)malloc(size * sizeof(char));
-    printf("arr[%d] address in hexadecimal: %p\n", i, (void *)arr[i]);
-    printf("arr[%d] address in decimal mod 32: %ld\n\n", i, (uintptr_t)arr[i] % 32);
-  }
-
-  printf("\n===================\nAligned address allocation:\n");
-  char *m_arr[10];
-  for (int i = 0; i < 10; i++) {
-    int size = rand() % 100 + 1;
-    printf("Allocating %d bytes\n", size);
-    m_arr[i] = (char *)mymalloc(size * sizeof(char));
-    printf("arr[%d] address in hexadecimal: %p\n", i, (void *)m_arr[i]);
-    printf("arr[%d] address in decimal mod 32: %ld\n\n", i, (uintptr_t)m_arr[i] % 32);
-  }
-
-  for (int i = 0; i < 10; i++) {
-    myfree(m_arr[i]);
-    free(arr[i]);
-  }
-
-  return 0;
+	printf("Size of pointer is: %zu bytes\n", sizeof(void *));
+	printf("Normal address allocation:\n");
+	test_mymalloc(malloc, free);
+  printf("\n\n");
+  printf("Aligned address allocation:\n");
+	test_mymalloc(mymalloc, myfree);
+	return 0;
 }

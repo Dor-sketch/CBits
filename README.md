@@ -53,16 +53,17 @@ This repository contains a diverse collection of C functions, focusing on bit ma
 
 ### Overview
 
-The [mymalloc.c](mymalloc.c) program is a result of my self-study following a failed interview question. It includes a custom implementation of the `malloc` and `free` functions in C, encapsulated within `mymalloc` and `myfree` wrapper functions. These functions are uniquely designed to allocate and free memory addresses aligned to specific hexadecimal increments (0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x00).
+The [mymalloc.c](mymalloc.c) program is a result of my self-study following a failed interview question. It includes a custom implementation of the `malloc` and `free` functions in C, encapsulated within `mymalloc` and `myfree` wrapper functions. These functions are uniquely designed to allocate and free memory addresses aligned to specific hexadecimal increments `(0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x00)`, or in other words, multiples of `32 bytes`.
 
 The offset from the original to the aligned address is stored in the byte immediately preceding the address returned by `mymalloc`.
 
 This project was an insightful journey into pointers and memory allocation in C, spurred by my experience in an interview setting.
 
 <p align="center">
-  <img src="./images/my_malloc_output.png" width="400">
+  <img src="./images/mem_comp.png" alt="Alt text">
 </p>
-
+<div align="center"><i>Comparing malloc and mymalloc</i>
+</div>
 
 ---
 
@@ -80,13 +81,17 @@ This project was an insightful journey into pointers and memory allocation in C,
 
     - The modulus operator `%` is applicable only to integer types. To use it with pointers, explicit casting to an appropriate integer type is necessary, as pointers are not inherently integer types. Possible solution is also using the `uintptr_t` type, which is an unsigned integer type capable of storing a pointer.
 
-4. **Casting when Working with Pointers:**
+4. **Comparing Pointers:**
+
+    - Using Arithmetic on pointers is generally not recommended, so instead of comparing addresses (wich results in a data type of `ptrdiff_t`), I found it easier to iterate over the allocated memory using array-like syntax, and compare the values at each address. For instance, on `char *ptr`, I used `ptr[0]` to access the byte at the address pointed to by ptr, and `ptr[1]` to access the byte after it. So I could simply find the offset without moving or modifying the pointer. At first this looks somwhat strange, but it's a common practice in C.
+
+5. **Casting when Working with Pointers:**
 
     - When returning a pointer from `mymalloc`, it should be cast to `(void *)` to match the return type of the standard `malloc` function. This ensures compatibility and proper use in various contexts. Similarly, casting is required when calling `malloc`, as it returns a `(void *)` pointer, which must be cast to the appropriate type.
 
-5. **Malloc Allignments:**
+6. **Malloc Allignments:**
 
-    - The `malloc` function returns a pointer to a memory address thats already aligned. The implementation is actually using a header `union` and inside it a `struct`.
+    - The `malloc` function returns a pointer to a memory address **thats already aligned**. The implementation is actually using a header `union` and inside it a `struct`.
 
 To see example based on 20 random sizes allocation, run the following command:
 
@@ -94,17 +99,37 @@ To see example based on 20 random sizes allocation, run the following command:
 gcc -o mymalloc mymalloc.c && ./mymalloc
 ```
 
-![Alt text](images/mymalloc_valgrind.png)
+You can also try to run the program with `valgrind` to check for memory leaks, or complile it for 32-bit architecture to see the difference in memory addresses. Note that valgrind works with the 64-bit version.
+
+```bash
+gcc -m32 -o mymalloc mymalloc.c && ./mymalloc
+```
+
+```bash
+gcc -o mymalloc mymalloc.c && valgrind ./mymalloc
+```
+
+<p align="center">
+  <img src="./images/mymalloc_valgrind.png" width="600">
+  </p>
+<div align="center"><i>Valgrind output</i>
+</div>
 
 ---
 
 ## 🧬 Basice Implementation of Inheritance and Polymorphism in C
 
-![Alt text](images/oop_output.png)
-
 ### Overview
 
 File [oop.c](oop.c) includes a simple implementation of OOP concepts in C. The design is inspired by the `C++` implementation of OOP, which uses structs and function pointers to achieve polymorphism.
+
+<p align="center">
+  <img src="./images/oop_output.png" width="600">
+</p>
+<div align="center"><i>Output of the OOP program</i>
+</div>
+
+---
 
 ### Features
 
@@ -200,7 +225,11 @@ Compile the program by adding [pingpong.c](pingpong.c) to the xv6 source file, u
 
 📈 The program outputs the total number of exchanges, total time in ticks, and exchanges per second.
 
-![Alt text](./images/pingpong_output.png)
+<p align="center">
+  <img src="./images/pingpong_output.png" width="600">
+</p>
+<div align="center"><i>Output of the PingPong program</i>
+</div>
 
 ---
 
@@ -260,11 +289,13 @@ This program is designed as an educational tool to understand the basics of mult
 
 ## 🧮 Count Bits Program
 
+File [count_bits.c](count_bits.c) offers basice functions to count bits in C, including a lookup table and the n&(n-1) algorithm of Brian Kernighan, and an iterative approach. The program also includes several utility functions for printing bits and counting bits in different data types, and compare the performance of each approach by calculating time / cpu cycles for each function.
+
 <p align="center">
   <img src="images/count_bits_1.png" width="400">
 </p>
-
-File [count_bits.c](count_bits.c) offers basice functions to count bits in C:
+<div align="center"><i>Count Bits Program</i>
+</div>
 
 ### Lookup Table
 
@@ -278,9 +309,11 @@ Full table of $n$ bits will require $2^{n}$ entries, which is $2^4$ entries for 
 
 A table for a word will require $2^{16}$ entries, which is 64KB without considering the data type. The size can be reduced by using a smaller data type for the table entries, such as `uint8_t` or `uint16_t`.
 
-  | 4-bit lookup table from 0 (right down) to 15 (left up) |
-  | :----------------------------------------------------: |
-  | ![Alt Text](images/table.png)          |
+<p align="center">
+  <img src="images/table.png" width="700">
+</p>
+<div align="center"><i>4 bit lookup table from 0 (right down) to 15 (left up)</i>
+</div>
 
 ### Using n&(n-1) algorithm of [Brian Kernighan](https://en.wikipedia.org/wiki/Brian_Kernighan)
 
