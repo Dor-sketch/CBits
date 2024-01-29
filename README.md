@@ -55,51 +55,26 @@ This repository contains a diverse collection of C functions, focusing on bit ma
 
 The [mymalloc.c](mymalloc.c) program is a result of my self-study following a failed interview question. It includes a custom implementation of the `malloc` and `free` functions in C, encapsulated within `mymalloc` and `myfree` wrapper functions. These functions are uniquely designed to allocate and free memory addresses aligned to specific hexadecimal increments `(0x20, 0x40, 0x60, 0x80, 0xA0, 0xC0, 0xE0, 0x00)`, or in other words, multiples of `32 bytes`.
 
+**Update**: The program now includes an `ALIGNED_BYTES` macro, which can be used to change the alignment of the allocated memory. The program supports up to 255 bytes alignment, which fits in a single byte offset.
+
 The offset from the original to the aligned address is stored in the byte immediately preceding the address returned by `mymalloc`.
 
 This project was an insightful journey into pointers and memory allocation in C, spurred by my experience in an interview setting.
 
 <p align="center">
-  <img src="./images/mem_comp.png" alt="Alt text">
+  <img src="./images/mem_comp.png" alt="Memory allocation comparison between malloc and mymalloc">
 </p>
-<div align="center"><i>Comparing malloc and mymalloc</i>
-</div>
+<div align="center"><i>Comparing malloc and mymalloc</i></div>
 
 ---
 
-### Key Takeaways
-
-1. **Pointer Arithmetic and Type Size Awareness:**
-
-    - Adding 1 to a pointer increases the address by the size of the type it points to. For instance, adding 1 to a `char *` (1 byte) increments the address by 1 byte. Conversely, adding 1 to an `unsigned long long *` (8 bytes) increments it by 8 bytes. My initial attempts inadvertently added 32 * sizeof(unsigned long long) (256 bytes), instead of the intended 32 bytes for the custom alignment (0x20).
-
-2. **Subtracting from Pointers:**
-
-    - Similarly, subtracting 1 from a pointer decrements the address by the size of the type it points to. My initial approach subtracted 1 from larger types, like `unsigned long long *`, which decremented the address by 8 bytes, instead of the intended 1 byte. The correct approach is to use a `char *`, which decrements the address by 1 byte.
-
-3. **Using the Modulus Operator with Pointers:**
-
-    - The modulus operator `%` is applicable only to integer types. To use it with pointers, explicit casting to an appropriate integer type is necessary, as pointers are not inherently integer types. Possible solution is also using the `uintptr_t` type, which is an unsigned integer type capable of storing a pointer.
-
-4. **Comparing Pointers:**
-
-    - Using Arithmetic on pointers is generally not recommended, so instead of comparing addresses (wich results in a data type of `ptrdiff_t`), I found it easier to iterate over the allocated memory using array-like syntax, and compare the values at each address. For instance, on `char *ptr`, I used `ptr[0]` to access the byte at the address pointed to by ptr, and `ptr[1]` to access the byte after it. So I could simply find the offset without moving or modifying the pointer. At first this looks somwhat strange, but it's a common practice in C.
-
-5. **Casting when Working with Pointers:**
-
-    - When returning a pointer from `mymalloc`, it should be cast to `(void *)` to match the return type of the standard `malloc` function. This ensures compatibility and proper use in various contexts. Similarly, casting is required when calling `malloc`, as it returns a `(void *)` pointer, which must be cast to the appropriate type.
-
-6. **Malloc Allignments:**
-
-    - The `malloc` function returns a pointer to a memory address **thats already aligned**. The implementation is actually using a header `union` and inside it a `struct`.
-
-To see example based on 20 random sizes allocation, run the following command:
+To see an example based on 20 random size allocations, run the following command:
 
 ```bash
-gcc -o mymalloc mymalloc.c && ./mymalloc
+gcc -Wall -Wextra mymalloc.c -o mymalloc && ./mymalloc
 ```
 
-You can also try to run the program with `valgrind` to check for memory leaks, or complile it for 32-bit architecture to see the difference in memory addresses. Note that valgrind works with the 64-bit version.
+to check for memory leaks, or compile it for 32-bit architecture to see the difference in memory addresses. Note that valgrind works with the 64-bit version.
 
 ```bash
 gcc -m32 -o mymalloc mymalloc.c && ./mymalloc
@@ -114,6 +89,70 @@ gcc -o mymalloc mymalloc.c && valgrind ./mymalloc
   </p>
 <div align="center"><i>Valgrind output</i>
 </div>
+
+---
+
+### Key Takeaways
+
+1. **Pointer Arithmetic and Type Size Awareness**
+
+    ```C
+    void *wrong_mymalloc1(size_t size) {
+        unsigned long long *ptr = (unsigned long long *)malloc(size + ALIGNED_BYTES);
+        unsigned char offset = ALIGNED_BYTES - ((uintptr_t)ptr % ALIGNED_BYTES);
+        unsigned long long *ptr2 = ptr + offset; // + how many bytes?
+        *(ptr2 - 1) = offset; // Is it the byte before ptr2?
+        return (void *)ptr2;
+    }
+    ```
+
+    - :x: Adding `offset` to `ptr` performs arithmetic on `unsigned long long *`, resulting in an addition of `offset * sizeof(unsigned long long)` bytes, which is incorrect.
+    - :white_check_mark: Perform byte-wise pointer arithmetic by casting `ptr` to `unsigned char *`. Like `unsigned char *ptr2 = (unsigned char *)ptr + offset;`
+
+---
+
+2. **Using Operators such as `&` and `%` with Pointers:**
+
+    ```C
+    void *wrong_mymalloc2(size_t size) {
+        unsigned char *ptr = (unsigned char *)malloc(size + ALIGNED_BYTES);
+        unsigned char offset = ALIGNED_BYTES - (&(*ptr) % ALIGNED_BYTES);
+        unsigned char *ptr2 = ptr + offset;
+        *(ptr2 - 1) = offset;
+        return (void *)ptr2;
+    }
+    ```
+
+    - :x: The expression `&(*ptr)` is unnecessary and incorrect.
+    - :x: The code incorrectly attempts to perform modulus operation on a pointer type, which is invalid in C. Instead, the pointer should first be cast to an appropriate integer type, like `uintptr_t`, before applying the modulus operation.
+    - :white_check_mark: The correct approach is to simply use `ptr` without additional dereferencing and address-of operations.
+    - :white_check_mark: The corrected line should be: `unsigned char offset = ALIGNED_BYTES - ((uintptr_t)ptr % ALIGNED_BYTES);`. Additionally, there is no need for the address-of operator `&` with `ptr`, as it's already a pointer.
+
+---
+
+3. **Casting when Working with (void \*) Pointers:**
+
+    ```C
+    void *wrong_mymalloc3(size_t size) {
+        char *ptr = (char *)malloc(size + ALIGNED_BYTES);
+        char offset = ALIGNED_BYTES - ((uintptr_t)ptr % ALIGNED_BYTES);
+        void *ptr2 = (void *)(ptr + offset);
+        *((char *)ptr2 - 1) = offset;
+        return ptr2;
+    }
+    ```
+
+    - :x: The cast `(char *)ptr = (char *)malloc(...)` is syntactically incorrect. It should be `char *ptr = (char *)malloc(...)`. Additionally, arithmetic on `(void *)` pointers is not allowed in C.
+    - :white_check_mark: Cast `ptr` to `char *` before performing arithmetic.
+
+---
+
+4. **More Points on Pointers**
+
+    - :white_check_mark: **Always perform proper pointer initialization**: Avoid omitting the initialization of `ptr2` before dereferencing it. This could lead to undefined behavior, as the pointer could point to an arbitrary memory address.
+    - :white_check_mark: **Check for malloc Failure**: Always check for `malloc` failure before proceeding with the allocation. This can be done by checking if `ptr` is `NULL` after the allocation.
+    - :white_check_mark: **Avoid Dereferencing Uninitialized Pointer**: Avoid dereferencing `ptr` before it has been correctly assigned, leading to undefined behavior. The line `ptr2[-1] = offset;` is executed when `ptr2` is still `NULL`, which could likely cause a segmentation fault.
+    - :white_check_mark: **Avoid Sign Overflow**: Be cautious if `char` is a signed type on some machines, which could cause an overflow when dealing with offset values greater than 127.
 
 ---
 
