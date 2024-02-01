@@ -111,10 +111,11 @@ int main() {
     int y = 15;
 
     int z = x & y;
-    z = x | y;
     printf("x&y=%d\n", z);
-
+    z = x | y;
+    printf("x|y=%d\n", z);
     z = x ^ y;
+    printf("x^y=%d\n", z);
 
     printf("x&y=%d\n", z);
     float test_number = -123.456f;

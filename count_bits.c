@@ -32,9 +32,9 @@ int count_bits_jumps(int num) {
 }
 
 /* count the number of bits (1's) in a number using iterative approach */
-int count_bits_iterative(long int input) {
+int count_bits_iterative(int input) {
 	int output = 0;
-	unsigned long int unsigned_input = input;
+	unsigned int unsigned_input = input;
 
 	for (size_t i = 0; i < sizeof(unsigned_input) * 8; i++) {
 		if (unsigned_input & 1)
@@ -66,7 +66,7 @@ void printIntBits(int k) {
 }
 
 /* printBits: print the bits in any data type */
-void printBits(void *ptr, size_t size) {
+void printBits(const void *ptr, size_t size) {
 	unsigned char *bytes = (unsigned char *)ptr;
 	for (size_t i = size - 1; i != SIZE_MAX; i--) {
 		for (int j = 7; j >= 0; j--) {
@@ -77,19 +77,19 @@ void printBits(void *ptr, size_t size) {
 	putchar('\n');
 }
 
+
 void correctness_example(void) {
 	// printing results for example
 	for (int i = -10; i < 10; i++) {
 		int num = rand() - RAND_MAX / 2;
 		printBits(&num, sizeof(num));
 		char buffer[50];
-		sprintf(buffer, "count_bits_nibbles(%d)", num);
+		snprintf(buffer, sizeof(buffer), "count_bits_nibbles(%d)", num);
 		printf("%-32s = %d\n", buffer, count_bits_nibbles(num));
-		sprintf(buffer, "count_bits_jumps(%d)", num);
+		snprintf(buffer, sizeof(buffer), "count_bits_jumps(%d)", num);
 		printf("%-32s = %d\n", buffer, count_bits_jumps(num));
-		sprintf(buffer, "count_bits_iterative(%d)", num);
-		printf("%-32s = %d\n", buffer,
-			   count_bits_iterative((unsigned int)num));
+		snprintf(buffer, sizeof(buffer), "count_bits_iterative(%d)", num);
+		printf("%-32s = %d\n", buffer, count_bits_iterative((unsigned int)num));
 		printf("\n");
 	}
 }
@@ -118,7 +118,8 @@ void performance_example(void) {
 }
 
 /* getSizeInBits: return the size of a data type in bits */
-int getSizeInBits(unsigned short int input) { return sizeof(input) * 8; }
+int getSizeInBits(unsigned short int input) {
+	return sizeof(input) * 8; }
 
 /* count the number of bits (1's) in a number in odd places*/
 int count_odd_bits(unsigned short int input) {
@@ -168,6 +169,6 @@ int scanbits(void) {
 int main() {
 	correctness_example();
 	performance_example();
-    printBits(&lookup, sizeof(lookup));
+	printBits(&lookup, sizeof(lookup));
 	return 0;
 }

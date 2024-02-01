@@ -12,12 +12,18 @@ This repository contains a diverse collection of C functions, focusing on bit ma
 
 <!-- code_chunk_output -->
 
-- [💾 Custom malloc & free Implementation](#-custom-malloc--free-implementation)
+- [💾 Custom malloc \& free Implementation](#-custom-malloc--free-implementation)
   - [Overview](#overview)
   - [Key Takeaways](#key-takeaways)
 - [🧬 Basice Implementation of Inheritance and Polymorphism in C](#-basice-implementation-of-inheritance-and-polymorphism-in-c)
   - [Overview](#overview-1)
   - [Features](#features)
+    - [🧬 Inheritance](#-inheritance)
+    - [🎭 Polymorphism](#-polymorphism)
+    - [📦 Encapsulation](#-encapsulation)
+    - [📞 Uniform Function Calls](#-uniform-function-calls)
+    - [💾 Memory Management](#-memory-management)
+    - [🔀 Type Casting](#-type-casting)
   - [Structure Overview](#structure-overview)
   - [Usage](#usage)
 - [🏓 Pipes PingPong Program](#-pipes-pingpong-program)
@@ -37,7 +43,7 @@ This repository contains a diverse collection of C functions, focusing on bit ma
   - [Note](#note)
 - [🧮 Count Bits Program](#-count-bits-program)
   - [Lookup Table](#lookup-table)
-  - [Using n&(n-1) algorithm of Brian Kernighan](#using-nn-1-algorithm-of-brian-kernighanhttpsenwikipediaorgwikibrian_kernighan)
+  - [Using n\&(n-1) algorithm of Brian Kernighan](#using-nn-1-algorithm-of-brian-kernighan)
   - [Iterative Approach](#iterative-approach)
   - [Utils Functions](#utils-functions)
   - [How to Use](#how-to-use)
@@ -213,7 +219,7 @@ File [oop.c](oop.c) includes a simple implementation of OOP concepts in C. The d
 The main function in `main.c` demonstrates the creation of different animal types and the invocation of their behaviors.
 
 ```bash
-gcc -o oop oop.c main.c && ./oop
+gcc -o oop oop.c && ./oop
 ```
 
 ---
